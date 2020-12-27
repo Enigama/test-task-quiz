@@ -33,25 +33,44 @@
             >
               prev step
             </button>
-            <button :class="['btn', isNext ? 'btn-outline-primary' : 'btn-outline-secondary']"
-                    type="button"
-                    @click="changeStep(+1)"
-                    :disabled="!isNext"
-            >
-              next step
-            </button>
+
+            <template>
+              <button v-if="isNext"
+                      :class="['btn', isNext ? 'btn-outline-primary' : 'btn-outline-secondary']"
+                      type="button"
+                      @click="changeStep(+1)"
+                      :disabled="!isNext"
+              >
+                next step
+              </button>
+
+              <button v-else
+                      :class="['btn', isNext ? 'btn-outline-primary' : 'btn-outline-secondary']"
+                      type="button"
+                      content="Choose one of the answers"
+                      v-tippy
+              >
+                next step
+              </button>
+            </template>
           </div>
         </template>
 
         <div v-else class="quiz__results">
           <h3 class="quiz__result-title">The quiz is done!!!</h3>
 
-          <div v-for="result in results" :key="result.title" class="quiz__result">
+          <div v-for="result in results"
+               :key="result.title"
+               class="quiz__result"
+          >
             <span><strong>{{ result.title }}: </strong></span>
             <span>{{ result.value }}</span>
           </div>
 
-          <button type="button" class="btn btn-outline-info quiz__reset" @click="restart">
+          <button type="button"
+                  class="btn btn-outline-info quiz__reset"
+                  @click="restart"
+          >
             Restart
           </button>
         </div>
@@ -230,5 +249,9 @@ export default {
 
 .quiz__reset {
   margin-top: 20px;
+}
+
+.btn {
+  transition: background-color 0.3s;
 }
 </style>
