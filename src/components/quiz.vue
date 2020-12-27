@@ -1,53 +1,61 @@
 <template>
   <div class="quiz">
-<!--    <tippy to="myTrigger" arrow>-->
-<!--      <div>-->
-<!--        <h3>Header</h3>-->
-<!--        <p style="color: black">data binding</p>-->
-<!--        <button>Click</button>-->
-<!--      </div>-->
-<!--    </tippy>-->
-
     <Spinner v-if="isLoading"/>
 
     <template v-else>
-      <form v-if="steps && !isError"
-            class="quiz__body"
+      <div v-if="steps && !isError"
+           class="quiz__body"
       >
-        <template v-for="(item, index) in quiz">
-          <Question v-if="currentStep === index + 1 && (!item.show_if || checkShowIf(item.show_if))"
-                    :title="item.title"
-                    :key="item.key"
-          >
-            <template v-for="answer in item.answers">
-              <Answer :answer="answer"
-                      :key="answer.value"
-                      :key-value="item.key"
-                      :results="results"
-                      @selected="isNextStep"
-                      @handlerAnswer="handlerAnswer"
-              />
-            </template>
-          </Question>
+        <template v-if="!isDone">
+          <template v-for="(item, index) in quiz">
+            <Question v-if="currentStep === index + 1 && (!item.show_if || checkShowIf(item.show_if))"
+                      :title="item.title"
+                      :key="item.key"
+            >
+              <template v-for="answer in item.answers">
+                <Answer :answer="answer"
+                        :key="answer.value"
+                        :key-value="item.key"
+                        :results="results"
+                        :title="item.title"
+                        @selected="isNextStep"
+                        @handlerAnswer="handlerAnswer"
+                />
+              </template>
+            </Question>
+          </template>
+
+          <div class="quiz__actions">
+            <button :class="['btn',  currentStep === 1 ? 'btn-outline-secondary' : 'btn-outline-primary']"
+                    type="button"
+                    @click="changeStep(-1)"
+                    :disabled="currentStep === 1"
+            >
+              prev step
+            </button>
+            <button :class="['btn', isNext ? 'btn-outline-primary' : 'btn-outline-secondary']"
+                    type="button"
+                    @click="changeStep(+1)"
+                    :disabled="!isNext"
+            >
+              next step
+            </button>
+          </div>
         </template>
 
-        <div class="quiz__actions">
-          <button :class="['btn',  currentStep === 1 ? 'btn-outline-secondary' : 'btn-outline-primary']"
-                  type="button"
-                  @click="changeStep(-1)"
-                  :disabled="currentStep === 1"
-          >
-            prev step
-          </button>
-          <button :class="['btn', isNext ? 'btn-outline-primary' : 'btn-outline-secondary']"
-                  type="button"
-                  @click="changeStep(+1)"
-                  :disabled="!isNext"
-          >
-            next step
+        <div v-else class="quiz__results">
+          <h3 class="quiz__result-title">The quiz is done!!!</h3>
+
+          <div v-for="result in results" :key="result.title" class="quiz__result">
+            <span><strong>{{ result.title }}: </strong></span>
+            <span>{{ result.value }}</span>
+          </div>
+
+          <button type="button" class="btn btn-outline-info quiz__reset" @click="restart">
+            Restart
           </button>
         </div>
-      </form>
+      </div>
 
       <div v-else-if="isError"
            class="quiz__empty"
@@ -83,11 +91,11 @@ export default {
       //error
       isError: false,
 
-      //flag for sub questions
-      isSub: false,
-
       //flag for next question
       isNext: false,
+
+      //flag done quiz
+      isDone: false,
     }
   },
 
@@ -124,8 +132,10 @@ export default {
     },
 
     changeStep(count) {
-      console.log(this.quiz[this.currentStep + count], this.currentStep, count)
       const newCount = this.currentStep + count;
+
+      console.log(newCount);
+      this.isDone = newCount > this.steps;
 
       if (newCount > this.steps || newCount <= 0) return;
 
@@ -133,13 +143,13 @@ export default {
       this.isNext = !(count > 0 && this.currentStep !== 1);
     },
 
-    handlerAnswer({target, key}) {
+    handlerAnswer({title, target, key}) {
       this.isNext = true;
 
       const value = target.value;
 
       if (!this.results.length) {
-        this.results.push({key, value})
+        this.results.push({title, key, value})
       } else {
         const existAnswer = this.results.some(item => item.key === key);
 
@@ -149,10 +159,9 @@ export default {
               item.value = value;
               return false
             }
-            console.log('sss')
           })
         } else {
-          this.results.push({key, value})
+          this.results.push({title, key, value})
         }
       }
     },
@@ -174,6 +183,13 @@ export default {
 
       return isShowQuestion;
     },
+
+    restart() {
+      this.currentStep = 1;
+      this.results = [];
+      this.isDone = false;
+      this.isNext = false;
+    }
   }
 }
 </script>
@@ -197,5 +213,22 @@ export default {
   min-width: 300px;
   display: flex;
   justify-content: space-between;
+}
+
+.quiz__result-title {
+  margin-bottom: 15px;
+}
+
+.quiz__result {
+  display: flex;
+  justify-content: space-between;
+}
+
+.quiz__result + .quiz__result {
+  margin-top: 5px;
+}
+
+.quiz__reset {
+  margin-top: 20px;
 }
 </style>

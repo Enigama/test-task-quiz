@@ -25,12 +25,13 @@ export default {
     },
     keyValue: Number,
     results: Array,
+    title: String,
   },
 
   methods: {
     handlerAnswer({target}) {
       const haveSub = this.answer.sub;
-      this.$emit('handlerAnswer', {target, key: this.keyValue, haveSub: !!haveSub})
+      this.$emit('handlerAnswer', {title: this.title, target, key: this.keyValue, haveSub: !!haveSub})
     },
 
     isChecked(value) {
