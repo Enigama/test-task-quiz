@@ -1,22 +1,30 @@
 <template>
   <div class="quiz">
+<!--    <tippy to="myTrigger" arrow>-->
+<!--      <div>-->
+<!--        <h3>Header</h3>-->
+<!--        <p style="color: black">data binding</p>-->
+<!--        <button>Click</button>-->
+<!--      </div>-->
+<!--    </tippy>-->
+
     <Spinner v-if="isLoading"/>
 
     <template v-else>
       <form v-if="steps && !isError"
             class="quiz__body"
       >
-        {{isNext ? 'next' : 'error'}}
         <template v-for="(item, index) in quiz">
-          <Question v-if="currentStep === index + 1"
+          <Question v-if="currentStep === index + 1 && (!item.show_if || checkShowIf(item.show_if))"
                     :title="item.title"
                     :key="item.key"
           >
             <template v-for="answer in item.answers">
               <Answer :answer="answer"
-                      :index="index"
                       :key="answer.value"
                       :key-value="item.key"
+                      :results="results"
+                      @selected="isNextStep"
                       @handlerAnswer="handlerAnswer"
               />
             </template>
@@ -24,13 +32,15 @@
         </template>
 
         <div class="quiz__actions">
-          <button type="button"
+          <button :class="['btn',  currentStep === 1 ? 'btn-outline-secondary' : 'btn-outline-primary']"
+                  type="button"
                   @click="changeStep(-1)"
                   :disabled="currentStep === 1"
           >
             prev step
           </button>
-          <button type="button"
+          <button :class="['btn', isNext ? 'btn-outline-primary' : 'btn-outline-secondary']"
+                  type="button"
                   @click="changeStep(+1)"
                   :disabled="!isNext"
           >
@@ -56,7 +66,11 @@ import Answer from "./answer/Answer";
 
 export default {
   name: 'Quiz',
-  components: {Question, Spinner, Answer},
+  components: {
+    Question,
+    Spinner,
+    Answer,
+  },
   data() {
     return {
       isLoading: true,
@@ -105,12 +119,18 @@ export default {
   },
 
   methods: {
+    isNextStep(value) {
+      this.isNext = value;
+    },
+
     changeStep(count) {
+      console.log(this.quiz[this.currentStep + count], this.currentStep, count)
       const newCount = this.currentStep + count;
+
       if (newCount > this.steps || newCount <= 0) return;
 
       this.currentStep = newCount;
-      if(count > 0) this.isNext = false;
+      this.isNext = !(count > 0 && this.currentStep !== 1);
     },
 
     handlerAnswer({target, key}) {
@@ -135,7 +155,25 @@ export default {
           this.results.push({key, value})
         }
       }
-    }
+    },
+
+    checkShowIf(values) {
+      let countEqual = 0;
+
+      values.forEach(item => {
+        this.results.forEach(({value}) => {
+          +value === +item ? countEqual++ : null
+        })
+      })
+
+      const isShowQuestion = values.length <= countEqual;
+
+      if (!isShowQuestion) {
+        this.changeStep(this.isNext ? -1 : +1);
+      }
+
+      return isShowQuestion;
+    },
   }
 }
 </script>
@@ -152,5 +190,12 @@ export default {
 
 .quiz__body {
   flex-direction: column;
+}
+
+.quiz__actions {
+  margin-top: 40px;
+  min-width: 300px;
+  display: flex;
+  justify-content: space-between;
 }
 </style>

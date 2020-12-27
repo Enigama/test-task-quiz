@@ -16,5 +16,7 @@ export default {
 </script>
 
 <style scoped>
-
+.quiz__title {
+  margin-bottom: 40px;
+}
 </style>
