@@ -3,9 +3,10 @@
     <Spinner v-if="isLoading"/>
 
     <template v-else>
-      <div v-if="steps && !isError"
-           class="quiz__body"
+      <form v-if="steps && !isError"
+            class="quiz__body"
       >
+        {{isNext ? 'next' : 'error'}}
         <template v-for="(item, index) in quiz">
           <Question v-if="currentStep === index + 1"
                     :title="item.title"
@@ -23,10 +24,20 @@
         </template>
 
         <div class="quiz__actions">
-          <button @click="changeStep(-1)" :disabled="currentStep === 1">prev step</button>
-          <button @click="changeStep(+1)" :disabled="false">next step</button>
+          <button type="button"
+                  @click="changeStep(-1)"
+                  :disabled="currentStep === 1"
+          >
+            prev step
+          </button>
+          <button type="button"
+                  @click="changeStep(+1)"
+                  :disabled="!isNext"
+          >
+            next step
+          </button>
         </div>
-      </div>
+      </form>
 
       <div v-else-if="isError"
            class="quiz__empty"
@@ -60,6 +71,9 @@ export default {
 
       //flag for sub questions
       isSub: false,
+
+      //flag for next question
+      isNext: false,
     }
   },
 
@@ -96,9 +110,12 @@ export default {
       if (newCount > this.steps || newCount <= 0) return;
 
       this.currentStep = newCount;
+      if(count > 0) this.isNext = false;
     },
 
     handlerAnswer({target, key}) {
+      this.isNext = true;
+
       const value = target.value;
 
       if (!this.results.length) {

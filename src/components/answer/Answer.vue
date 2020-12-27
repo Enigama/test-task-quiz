@@ -5,7 +5,7 @@
   >
     <input type="radio"
            class="quiz__input"
-           :name="`quiz_${keyValue}`"
+           name="quiz"
            :value="answer.value"
     />
     <span class="quiz__info">
