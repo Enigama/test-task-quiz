@@ -1,6 +1,6 @@
 <template>
   <label
-      :class="['quiz__label', isChecked(answer.value) && 'active']"
+      class="quiz__label'"
       @change="handlerAnswer($event)"
   >
     <input type="radio"
@@ -55,9 +55,5 @@ export default {
 
 .quiz__label + .quiz__label {
   margin-top: 10px;
-}
-
-.quiz__label .active {
-  background-color: green;
 }
 </style>
