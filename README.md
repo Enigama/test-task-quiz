@@ -36,7 +36,7 @@ yarn add -g json-server
 ### Run json server
 ```
 run on public folder
-json-server --watch db.json 
+json-server --watch test-quiz.json
 ```
 
 ### Compiles and minifies for production
