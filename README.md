@@ -28,6 +28,17 @@ yarn install
 yarn serve
 ```
 
+### Install json server
+```
+yarn add -g json-server
+```
+
+### Run json server
+```
+run on public folder
+json-server --watch db.json 
+```
+
 ### Compiles and minifies for production
 ```
 yarn build
