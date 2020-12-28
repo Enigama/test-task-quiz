@@ -1,6 +1,6 @@
 <template>
   <label
-      class="quiz__label'"
+      class="quiz__label"
       @change="handlerAnswer($event)"
   >
     <input type="radio"

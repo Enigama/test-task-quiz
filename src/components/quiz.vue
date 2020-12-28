@@ -123,8 +123,6 @@ export default {
 
     axios.get('http://localhost:3000/data')
         .then(({data}) => {
-          this.steps = data.length;
-
           data.forEach((item) => {
             this.quiz.push(item)
 
@@ -135,6 +133,8 @@ export default {
               }
             })
           })
+
+          this.steps = this.quiz.length;
         })
         .catch(err => {
           this.isError = true;
@@ -153,7 +153,6 @@ export default {
     changeStep(count) {
       const newCount = this.currentStep + count;
 
-      console.log(newCount);
       this.isDone = newCount > this.steps;
 
       if (newCount > this.steps || newCount <= 0) return;
@@ -194,13 +193,14 @@ export default {
         })
       })
 
-      const isShowQuestion = values.length <= countEqual;
+      //if need full check values from show_if uncomment this variable and replace !countEqual to isShowQuestion and return isShowQuestion
+      // const isShowQuestion = values.length <= countEqual;
 
-      if (!isShowQuestion) {
+      if (!countEqual) {
         this.changeStep(this.isNext ? -1 : +1);
       }
 
-      return isShowQuestion;
+      return countEqual;
     },
 
     restart() {
